@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cerberus 4th Dimension - Demand Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        /* Default theme (dark) */
+        --background-body: #111827;
+        --background-primary: #1f2937;
+        --background-secondary: #374151;
+        --background-tertiary: #4b5563;
+        --background-hover: #4b5563;
+        --background-primary-translucent: rgba(31, 41, 55, 0.8);
+        --background-secondary-translucent: rgba(55, 65, 81, 0.6);
+        --background-backdrop: rgba(0, 0, 0, 0.7);
+        --text-primary: #f9fafb;
+        --text-secondary: #9ca3af;
+        --text-tertiary: #6b7280;
+        --border-primary: #374151;
+        --border-secondary: #4b5563;
+        --border-primary-translucent: rgba(55, 65, 81, 0.6);
+        --brand-text: #a5b4fc;
+        --brand-bg: #4f46e5;
+        --brand-ring: #818cf8;
+      }
+
+      @keyframes fade-in-out {
+        0% { opacity: 0; transform: translateY(-20px); }
+        10% { opacity: 1; transform: translateY(0); }
+        90% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-20px); }
+      }
+      .animate-fade-in-out {
+        animation: fade-in-out 3s ease-in-out forwards;
+      }
+      @keyframes yellow-flash {
+        0% { background-color: rgba(250, 204, 21, 0.5); }
+        100% { background-color: transparent; }
+      }
+      .yellow-flash {
+        animation: yellow-flash 1s ease-out;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.10.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-[var(--background-body)]">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

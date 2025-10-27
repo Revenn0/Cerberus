@@ -1,0 +1,6 @@
+{
+  "name": "Cerberus",
+  "description": "A modern web application to manage and analyze vehicle fleet demand, replacing traditional spreadsheets with an intelligent, streamlined interface.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
