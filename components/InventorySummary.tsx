@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { DemandEntry } from '../types';
 
@@ -15,7 +14,9 @@ interface HelmetSummary {
 }
 
 export const InventorySummary: React.FC<InventorySummaryProps> = ({ data, theme }) => {
-  const summary = data.reduce<HelmetSummary>((acc, entry) => {
+  // FIX: The `reduce` function call was using a generic type argument which is not supported in some TypeScript configurations.
+  // The fix is to remove the generic and instead cast the initial value to the desired type, allowing TypeScript to infer the accumulator's type.
+  const summary = data.reduce((acc, entry) => {
     const group = entry.group || 'Unscheduled';
     if (entry.helmet && entry.helmet.trim() !== '') {
       if (!acc[group]) {
@@ -26,7 +27,7 @@ export const InventorySummary: React.FC<InventorySummaryProps> = ({ data, theme 
       acc[group].sizes[size] = (acc[group].sizes[size] || 0) + 1;
     }
     return acc;
-  }, {});
+  }, {} as HelmetSummary);
 
   const sortedGroups = Object.keys(summary).sort((a, b) => {
     if (a === 'Unscheduled') return 1;

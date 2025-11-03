@@ -4,6 +4,12 @@ import { InventorySummary } from './InventorySummary';
 import { SECTOR_THEMES } from '../constants';
 import type { DemandEntry, Vehicle, VehicleStatus } from '../types';
 
+const ArrowTrendingUpIcon: React.FC<{className?: string}> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>;
+const CheckBadgeIcon: React.FC<{className?: string}> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.4-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.4-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.4 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.4.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" /></svg>;
+const WrenchScrewdriverIcon: React.FC<{className?: string}> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.495-2.495a1.125 1.125 0 0 1 1.591 0l3.001 3.001a1.125 1.125 0 0 1 0 1.591l-2.495 2.495M11.42 15.17 8.613 12.363m2.807 2.807L8.614 12.363m2.807 2.807L15.17 11.42M8.614 12.363 6.364 10.113a1.125 1.125 0 0 1 0-1.591l3.001-3.001a1.125 1.125 0 0 1 1.591 0l2.25 2.25 M8.614 12.363 11.42 9.557" /></svg>;
+const UserIcon: React.FC<{className?: string}> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>;
+const ShieldExclamationIcon: React.FC<{className?: string}> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>;
+
 const VehicleStatusSummary: React.FC<{ vehicleStock: Vehicle[] }> = ({ vehicleStock }) => {
     const summary = useMemo(() => {
         const counts: Record<VehicleStatus, number> = {
@@ -23,32 +29,60 @@ const VehicleStatusSummary: React.FC<{ vehicleStock: Vehicle[] }> = ({ vehicleSt
     }, [vehicleStock]);
 
     const summaryCards: { status: VehicleStatus, label: string, color: string, icon: React.ReactNode}[] = [
-        { status: 'on_hire', label: 'On Hire', color: 'border-teal-400', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg> },
-        { status: 'available', label: 'Available', color: 'border-green-400', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> },
-        { status: 'in_workshop', label: 'In Workshop', color: 'border-amber-400', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> },
-        { status: 'with_driver', label: 'With Driver', color: 'border-blue-400', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
-        { status: 'stolen', label: 'Stolen', color: 'border-red-400', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> },
+        { status: 'on_hire', label: 'On Hire', color: 'text-teal-400', icon: <ArrowTrendingUpIcon className="h-6 w-6" /> },
+        { status: 'available', label: 'Available', color: 'text-green-400', icon: <CheckBadgeIcon className="h-6 w-6" /> },
+        { status: 'in_workshop', label: 'In Workshop', color: 'text-amber-400', icon: <WrenchScrewdriverIcon className="h-6 w-6" /> },
+        { status: 'with_driver', label: 'With Driver', color: 'text-blue-400', icon: <UserIcon className="h-6 w-6" /> },
+        { status: 'stolen', label: 'Stolen', color: 'text-red-400', icon: <ShieldExclamationIcon className="h-6 w-6" /> },
     ];
     
     return (
         <div className="bg-[var(--background-primary-translucent)] backdrop-blur-sm border border-[var(--border-primary-translucent)] shadow-2xl rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">Vehicle Fleet Status</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                <div className="bg-[var(--background-secondary-translucent)] p-6 rounded-lg flex items-center justify-between col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-1">
-                    <div>
-                        <p className="text-[var(--text-secondary)] text-sm font-medium">Total Fleet</p>
-                        <p className="text-[var(--text-primary)] text-4xl font-bold">{summary.total}</p>
-                    </div>
+             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-[var(--text-primary)]">Vehicle Fleet Status</h2>
+                    <p className="text-[var(--text-secondary)] mt-1">An overview of all {summary.total} vehicles in the fleet.</p>
                 </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 {summaryCards.map(card => (
-                    <div key={card.status} className={`bg-[var(--background-primary)] border-l-4 ${card.color} rounded-r-lg shadow-md p-6 flex items-center justify-between`}>
-                        <div>
-                            <p className="text-[var(--text-secondary)] font-semibold">{card.label}</p>
-                            <p className="text-[var(--text-primary)] text-4xl font-bold">{summary[card.status]}</p>
+                    <div key={card.status} className={`p-6 rounded-xl bg-[var(--background-primary)] border border-[var(--border-secondary)]`}>
+                        <div className="flex items-center justify-between">
+                            <h3 className={`font-semibold ${card.color}`}>{card.label}</h3>
+                            <div className={card.color}>{card.icon}</div>
                         </div>
-                        {card.icon}
+                        <p className="text-3xl font-bold text-[var(--text-primary)] mt-4">{summary[card.status]}</p>
                     </div>
                 ))}
+            </div>
+
+            <div className="bg-[var(--background-primary)] p-6 rounded-xl border border-[var(--border-secondary)]">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">Fleet Distribution Chart</h3>
+                <div className="space-y-4">
+                    {summaryCards.map(card => {
+                        const percentage = summary.total > 0 ? (summary[card.status] / summary.total) * 100 : 0;
+                        const colorMap: Record<string, string> = {
+                            'text-teal-400': 'bg-teal-500',
+                            'text-green-400': 'bg-green-500',
+                            'text-amber-400': 'bg-amber-500',
+                            'text-blue-400': 'bg-blue-500',
+                            'text-red-400': 'bg-red-500',
+                        };
+
+                        return (
+                            <div key={card.status}>
+                                <div className="flex justify-between items-center text-sm mb-1">
+                                    <span className={`font-medium ${card.color}`}>{card.label}</span>
+                                    <span className="text-[var(--text-secondary)] font-mono">{summary[card.status]} / {summary.total}</span>
+                                </div>
+                                <div className="w-full bg-[var(--background-tertiary)] rounded-full h-2.5">
+                                    <div className={`${colorMap[card.color]} h-2.5 rounded-full transition-all duration-500`} style={{ width: `${percentage}%` }}></div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     )
