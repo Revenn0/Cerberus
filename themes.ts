@@ -2,79 +2,72 @@ export type Theme = {
   [key: string]: string;
 };
 
-export const darkTheme: Theme = {
-  '--background-body': '#111827',
-  '--background-primary': '#1f2937',
-  '--background-secondary': '#374151',
-  '--background-tertiary': '#4b5563',
-  '--background-hover': '#4b5563',
-  '--background-primary-translucent': 'rgba(31, 41, 55, 0.8)',
-  '--background-secondary-translucent': 'rgba(55, 65, 81, 0.6)',
-  '--background-backdrop': 'rgba(0, 0, 0, 0.7)',
-  '--text-primary': '#f9fafb',
-  '--text-secondary': '#9ca3af',
-  '--text-tertiary': '#6b7280',
-  '--border-primary': '#374151',
-  '--border-secondary': '#4b5563',
-  '--border-primary-translucent': 'rgba(55, 65, 81, 0.6)',
-  '--brand-text': '#a5b4fc',
-  '--brand-bg': '#4f46e5',
-  '--brand-ring': '#818cf8',
-};
-
+// Professional Light Theme (Default)
 export const lightTheme: Theme = {
-  '--background-body': '#f3f4f6',
+  '--background-body': '#f1f5f9', // Slate 100
   '--background-primary': '#ffffff',
-  '--background-secondary': '#f9fafb',
-  '--background-tertiary': '#e5e7eb',
-  '--background-hover': '#f3f4f6',
-  '--background-primary-translucent': 'rgba(255, 255, 255, 0.8)',
-  '--background-secondary-translucent': 'rgba(243, 244, 246, 0.6)',
-  '--background-backdrop': 'rgba(255, 255, 255, 0.7)',
-  '--text-primary': '#1f2937',
-  '--text-secondary': '#6b7280',
-  '--text-tertiary': '#9ca3af',
-  '--border-primary': '#e5e7eb',
-  '--border-secondary': '#d1d5db',
-  '--border-primary-translucent': 'rgba(229, 231, 235, 0.6)',
-  '--brand-text': '#4338ca',
-  '--brand-bg': '#4f46e5',
-  '--brand-ring': '#6366f1',
+  '--background-secondary': '#f8fafc', // Slate 50
+  '--background-tertiary': '#e2e8f0', // Slate 200
+  '--background-hover': '#f1f5f9',
+  '--background-sidebar': '#0f172a', // Slate 900
+  '--text-sidebar': '#cbd5e1',
+  '--text-sidebar-hover': '#ffffff',
+  '--bg-sidebar-hover': '#1e293b',
+  '--background-primary-translucent': 'rgba(255, 255, 255, 0.95)',
+  '--background-secondary-translucent': 'rgba(248, 250, 252, 0.95)',
+  '--background-backdrop': 'rgba(15, 23, 42, 0.4)',
+  '--text-primary': '#0f172a', // Slate 900
+  '--text-secondary': '#475569', // Slate 600
+  '--text-tertiary': '#94a3b8', // Slate 400
+  '--border-primary': '#e2e8f0', // Slate 200
+  '--border-secondary': '#cbd5e1', // Slate 300
+  '--border-primary-translucent': 'rgba(226, 232, 240, 0.8)',
+  '--brand-text': '#2563eb',
+  '--brand-bg': '#2563eb',
+  '--brand-hover': '#1d4ed8',
+  '--brand-ring': '#60a5fa',
 };
 
-const logisticsTheme: Theme = { ...darkTheme };
-
-const workshopTheme: Theme = {
-  ...darkTheme,
-  '--brand-text': '#fcd34d', // amber-300
-  '--brand-bg': '#d97706',   // amber-600
-  '--brand-ring': '#fbbf24', // amber-400
+// Professional Dark Theme
+export const darkTheme: Theme = {
+  '--background-body': '#0f172a', // Slate 900
+  '--background-primary': '#1e293b', // Slate 800
+  '--background-secondary': '#334155', // Slate 700
+  '--background-tertiary': '#475569', // Slate 600
+  '--background-hover': '#334155',
+  '--background-sidebar': '#020617', // Slate 950
+  '--text-sidebar': '#94a3b8',
+  '--text-sidebar-hover': '#f8fafc',
+  '--bg-sidebar-hover': '#1e293b',
+  '--background-primary-translucent': 'rgba(30, 41, 59, 0.95)',
+  '--background-secondary-translucent': 'rgba(51, 65, 85, 0.95)',
+  '--background-backdrop': 'rgba(0, 0, 0, 0.7)',
+  '--text-primary': '#f8fafc', // Slate 50
+  '--text-secondary': '#cbd5e1', // Slate 300
+  '--text-tertiary': '#94a3b8', // Slate 400
+  '--border-primary': '#334155', // Slate 700
+  '--border-secondary': '#475569', // Slate 600
+  '--border-primary-translucent': 'rgba(51, 65, 85, 0.8)',
+  '--brand-text': '#60a5fa', // Blue 400
+  '--brand-bg': '#3b82f6', // Blue 500
+  '--brand-hover': '#2563eb', // Blue 600
+  '--brand-ring': '#3b82f6',
 };
 
-const hirefleetTheme: Theme = {
-  ...darkTheme,
-  '--brand-text': '#5eead4', // teal-300
-  '--brand-bg': '#0d9488',   // teal-600
-  '--brand-ring': '#2dd4bf', // teal-400
-};
-
-
-export const christmasTheme: Theme = { ...darkTheme, '--brand-text': '#f87171', '--brand-bg': '#b91c1c', '--brand-ring': '#ef4444' };
-export const summerTheme: Theme = { ...lightTheme, '--brand-text': '#f59e0b', '--brand-bg': '#fb923c', '--brand-ring': '#fdba74' };
-export const autumnTheme: Theme = { ...darkTheme, '--brand-text': '#f59e0b', '--brand-bg': '#d97706', '--brand-ring': '#fbbf24' };
-export const easterTheme: Theme = { ...lightTheme, '--brand-text': '#a78bfa', '--brand-bg': '#8b5cf6', '--brand-ring': '#c4b5fd' };
-export const springTheme: Theme = { ...lightTheme, '--brand-text': '#4ade80', '--brand-bg': '#22c55e', '--brand-ring': '#86efac' };
-
+const logisticsTheme: Theme = { ...lightTheme, '--brand-bg': '#4f46e5', '--brand-text': '#4338ca' }; // Indigo
+const workshopTheme: Theme = { ...lightTheme, '--brand-bg': '#d97706', '--brand-text': '#b45309' }; // Amber
+const hirefleetTheme: Theme = { ...lightTheme, '--brand-bg': '#059669', '--brand-text': '#047857' }; // Emerald
 
 export const themes = {
-    dark: darkTheme,
     light: lightTheme,
+    dark: darkTheme,
     logistics: logisticsTheme,
     workshop: workshopTheme,
     hirefleet: hirefleetTheme,
-    christmas: christmasTheme,
-    summer: summerTheme,
-    autumn: autumnTheme,
-    easter: easterTheme,
-    spring: springTheme,
+    // Legacy mapping
+    christmas: lightTheme,
+    summer: lightTheme,
+    autumn: lightTheme,
+    easter: lightTheme,
+    spring: lightTheme,
 };

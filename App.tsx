@@ -1,6 +1,4 @@
-
-
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { DemandTable } from './components/DemandTable';
 import { MOCK_DEMAND_DATA, SECTOR_THEMES, MOCK_USERS, MOCK_CHAT_MESSAGES, MOCK_VEHICLE_STOCK, MOCK_HOME_PAGE_CONTENT } from './constants';
@@ -30,8 +28,9 @@ const AppNotification: React.FC<{ message: string; onClose: () => void }> = ({ m
   }, [onClose]);
 
   return (
-    <div className="fixed top-5 right-5 bg-[var(--brand-bg)] text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-      {message}
+    <div className="fixed top-5 right-5 bg-[var(--brand-bg)] text-white px-4 py-3 rounded-md shadow-lg z-50 animate-fade-in flex items-center gap-3">
+      <div className="w-2 h-2 bg-white rounded-full"></div>
+      <span className="font-medium text-sm">{message}</span>
     </div>
   );
 };
@@ -44,11 +43,39 @@ const SECTOR_FLOW: Record<Sector, Sector | null> = {
   HIREFLEET: null,
 };
 
+// Helper for persistence
+const useStickyState = <T,>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const stickyValue = window.localStorage.getItem(key);
+      return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
+    } catch (err) {
+      return defaultValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(state));
+    } catch (err) {
+      console.error("Could not save state to local storage", err);
+    }
+  }, [key, state]);
+
+  return [state, setState];
+};
+
+
 function App() {
   const [authenticatedUser, setAuthenticatedUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>(MOCK_USERS);
-  const [demandData, setDemandData] = useState<DemandEntry[]>(MOCK_DEMAND_DATA);
-  const [vehicleStock, setVehicleStock] = useState<Vehicle[]>(MOCK_VEHICLE_STOCK);
+  
+  // Persistent State
+  const [users, setUsers] = useStickyState<User[]>('cerberus_users', MOCK_USERS);
+  const [demandData, setDemandData] = useStickyState<DemandEntry[]>('cerberus_demand', MOCK_DEMAND_DATA);
+  const [vehicleStock, setVehicleStock] = useStickyState<Vehicle[]>('cerberus_stock', MOCK_VEHICLE_STOCK);
+  const [chatMessages, setChatMessages] = useStickyState<Record<Sector | 'ALL', ChatMessage[]>>('cerberus_chat', MOCK_CHAT_MESSAGES);
+  const [homePageContent, setHomePageContent] = useStickyState<HomePageContent>('cerberus_home', MOCK_HOME_PAGE_CONTENT);
+
   const [appNotification, setAppNotification] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Sector>('LOGISTICS');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
@@ -60,44 +87,41 @@ function App() {
   const [auditModal, setAuditModal] = useState<{ isOpen: boolean; demandId?: number }>({ isOpen: false });
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const [demandViewModal, setDemandViewModal] = useState<{ isOpen: boolean; demand?: DemandEntry }>({ isOpen: false });
+
   const [currentPage, setCurrentPage] = useState<Page>('LOGIN');
   const [demandSearchQuery, setDemandSearchQuery] = useState('');
 
-  const [auditLog, setAuditLog] = useState<AuditLog[]>([]);
+  const [auditLog, setAuditLog] = useStickyState<AuditLog[]>('cerberus_audit', []);
   const [systemNotifications, setSystemNotifications] = useState<NotificationItem[]>([]);
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
   
-  const [chatMessages, setChatMessages] = useState<Record<Sector | 'ALL', ChatMessage[]>>(MOCK_CHAT_MESSAGES);
   const [isChatPanelVisible, setIsChatPanelVisible] = useState(true);
-  const [chatPanelWidth, setChatPanelWidth] = useState(384); // 96 * 4
+  const [chatPanelWidth, setChatPanelWidth] = useState(350); 
 
   const [highlightedDemandId, setHighlightedDemandId] = useState<number | null>(null);
   const [editingCell, setEditingCell] = useState<string | null>(null);
 
-  const [currentTheme, setCurrentTheme] = useState<ThemeName>('dark');
+  const [currentTheme, setCurrentTheme] = useState<ThemeName>('light');
   
   const [unreadMentions, setUnreadMentions] = useState(0);
   const [mentionNotification, setMentionNotification] = useState<ChatMessage | null>(null);
   
-  const [homePageContent, setHomePageContent] = useState<HomePageContent>(MOCK_HOME_PAGE_CONTENT);
-
-
   const currentUser = authenticatedUser;
 
   useEffect(() => {
     if(currentUser) {
-        const userTheme = currentUser.sector.toLowerCase() as ThemeName;
+        // Enforce light theme as default professional view
+        setCurrentTheme('light'); 
         setActiveTab(currentUser.sector);
         setCurrentPage('HOME');
-        setCurrentTheme(userTheme);
     } else {
         setCurrentPage('LOGIN');
-        setCurrentTheme('dark');
+        setCurrentTheme('light');
     }
   }, [currentUser]);
 
   useEffect(() => {
-    const theme = themes[currentTheme] || themes.dark;
+    const theme = themes[currentTheme] || themes.light;
     for (const key in theme) {
       document.documentElement.style.setProperty(key, theme[key]);
     }
@@ -339,11 +363,10 @@ function App() {
 
   const handleLogin = (user: User) => {
     setAuthenticatedUser(user);
-    showAppNotification(`Welcome back, ${user.name.split(' ')[0]}!`);
+    showAppNotification(`Signed in as ${user.name}`);
   };
 
   const handleLogout = () => {
-      showAppNotification(`You have been logged out.`);
       setAuthenticatedUser(null);
   };
 
@@ -378,7 +401,7 @@ function App() {
           showAppNotification(`Error: User with email ${newUser.email} already exists.`);
           return false;
       }
-      const userWithPassword: User = { ...newUser, password, id: Date.now(), theme: 'dark' };
+      const userWithPassword: User = { ...newUser, password, id: Date.now(), theme: 'light' };
       setUsers(prev => [userWithPassword, ...prev]);
       showAppNotification(`User ${newUser.name} created successfully.`);
       return true;
@@ -427,11 +450,11 @@ function App() {
   }, [demandData, currentUser, users, showAppNotification]);
   
   const ChatToggleButton = () => (
-      <button onClick={() => setIsChatPanelVisible(p => !p)} className="fixed top-1/2 right-0 z-30 transform -translate-y-1/2 bg-[var(--background-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 rounded-l-lg shadow-lg border-y border-l border-[var(--border-primary)] transition-all" style={{ right: isChatPanelVisible ? `${chatPanelWidth}px` : '0px' }}>
+      <button onClick={() => setIsChatPanelVisible(p => !p)} className="fixed top-24 right-0 z-30 bg-[var(--background-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 rounded-l-lg shadow-md border-y border-l border-[var(--border-primary)] transition-all flex items-center gap-2" style={{ right: isChatPanelVisible ? `${chatPanelWidth}px` : '0px' }}>
           {isChatPanelVisible ? (
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" /></svg>
           ) : (
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" /></svg>
           )}
       </button>
   );
@@ -450,46 +473,57 @@ function App() {
         case 'DEMAND':
             return (
                 <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-                        <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                    <main className="flex-1 p-6 overflow-y-auto bg-[var(--background-body)]">
+                        <div className="flex justify-between items-center mb-6">
                             <div>
-                            <h1 className="text-3xl font-bold text-[var(--text-primary)]">Current Demand</h1>
-                            <p className="text-[var(--text-secondary)] mt-1">Live view of all scheduled vehicle movements.</p>
+                                <h1 className="text-2xl font-bold text-[var(--text-primary)]">Demand Board</h1>
+                                <p className="text-[var(--text-secondary)] text-sm mt-1">Real-time fleet tracking and schedule management.</p>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <svg className="w-5 h-5 text-[var(--text-secondary)]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.358 3.358a1 1 0 0 1-1.414 1.414l-3.358-3.358A7 7 0 0 1 2 9Z" clipRule="evenodd" /></svg>
+                                        <svg className="w-4 h-4 text-[var(--text-tertiary)]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.358 3.358a1 1 0 0 1-1.414 1.414l-3.358-3.358A7 7 0 0 1 2 9Z" clipRule="evenodd" /></svg>
                                     </span>
-                                    <input type="text" placeholder="Search demand..." value={demandSearchQuery} onChange={e => setDemandSearchQuery(e.target.value)} className={`w-64 bg-[var(--background-tertiary)] border border-[var(--border-secondary)] rounded-md py-2 pl-10 pr-4 text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-ring)]`} />
+                                    <input type="text" placeholder="Search..." value={demandSearchQuery} onChange={e => setDemandSearchQuery(e.target.value)} className="w-64 bg-white border border-[var(--border-secondary)] rounded-md py-2 pl-9 pr-4 text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-ring)] focus:border-[var(--brand-ring)] transition-all shadow-sm" />
                                 </div>
                                 
-                                <button onClick={() => setHistoryModalOpen(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-[var(--text-primary)] bg-[var(--background-secondary)] hover:bg-[var(--background-hover)] transition-colors shadow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                <button onClick={() => setHistoryModalOpen(true)} className="flex items-center gap-2 px-3 py-2 rounded-md font-medium text-sm text-[var(--text-secondary)] bg-white border border-[var(--border-secondary)] hover:bg-[var(--background-hover)] transition-colors shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" /></svg>
                                     History
                                 </button>
+                                
                                 {(currentUser.sector === 'LOGISTICS' || currentUser.sector === 'WORKSHOP' || currentUser.sector === 'HIREFLEET') && activeTab === currentUser.sector && (
-                                <button onClick={() => setFormModal({ isOpen: true, mode: 'create' })} className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-white transition-all bg-[var(--brand-bg)] hover:opacity-90 shadow-lg`}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
-                                    Create Demand
+                                <button onClick={() => setFormModal({ isOpen: true, mode: 'create' })} className="flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm text-white bg-[var(--brand-bg)] hover:bg-[var(--brand-hover)] transition-all shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+                                    New Demand
                                 </button>
                                 )}
                             </div>
                         </div>
-                        <div className="mb-4 border-b border-[var(--border-primary)]">
-                            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                        <div className="mb-4">
+                            <nav className="flex space-x-1 p-1 bg-[var(--background-tertiary)] rounded-lg w-fit" aria-label="Tabs">
                             {DEMAND_TABS.map(tab => {
                                 const isVisible = currentUser.role === 'supervisor' || currentUser.role === 'admin' || tab === currentUser.sector;
                                 if (!isVisible) return null;
-                                const theme = SECTOR_THEMES[tab];
                                 const isActive = activeTab === tab;
                                 return (
-                                <button key={tab} onClick={() => handleTabClick(tab)} className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${isActive ? `${theme.border} ${theme.text}` : `border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-primary)] ${theme.hoverBorder}`}`}>{tab.charAt(0) + tab.slice(1).toLowerCase()}</button>
+                                <button 
+                                    key={tab} 
+                                    onClick={() => handleTabClick(tab)} 
+                                    className={`
+                                        px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200
+                                        ${isActive 
+                                            ? 'bg-[var(--background-primary)] text-[var(--text-primary)] shadow-sm' 
+                                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}
+                                    `}
+                                >
+                                    {tab.charAt(0) + tab.slice(1).toLowerCase()}
+                                </button>
                                 );
                             })}
                             </nav>
                         </div>
-                        <div className="bg-[var(--background-primary-translucent)] backdrop-blur-sm border border-[var(--border-primary-translucent)] shadow-2xl rounded-xl overflow-hidden">
+                        <div className="bg-[var(--background-primary)] border border-[var(--border-primary)] shadow-sm rounded-lg overflow-hidden">
                             <DemandTable data={filteredData} onCopy={showAppNotification} onEdit={handleLockAndEdit} onHandover={handleInitiateHandover} onComplete={handleInitiateCompletion} onViewHistory={handleOpenAuditHistory} activeSector={activeTab} collapsedGroups={collapsedGroups} onToggleGroup={handleToggleGroup} theme={activeThemeStyle} currentUser={currentUser} allUsers={users} onUpdateCell={handleUpdateDemandCell} onAssignUser={handleAssignUser} onRowDragStart={(e, demand) => e.dataTransfer.setData("application/json", JSON.stringify(demand))} highlightedDemandId={highlightedDemandId} editingCell={editingCell} setEditingCell={setEditingCell} />
                         </div>
                     </main>
@@ -508,7 +542,7 @@ function App() {
       return renderPage();
     }
     return (
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-[var(--background-body)]">
         {renderPage()}
       </div>
     );

@@ -6,21 +6,21 @@ interface StatusPillProps {
 }
 
 const statusColorMap: Record<DemandStatus, string> = {
-  PIZZA: 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
-  LOCK: 'bg-red-500/20 text-red-300 border border-red-500/30',
-  COMPLETED: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
-  '': 'bg-[var(--background-tertiary)] text-[var(--text-secondary)] border border-[var(--border-secondary)]',
+  PIZZA: 'bg-[var(--status-warning-bg)] text-[var(--status-warning-text)] border-yellow-200',
+  LOCK: 'bg-[var(--status-error-bg)] text-[var(--status-error-text)] border-red-200',
+  COMPLETED: 'bg-[var(--status-success-bg)] text-[var(--status-success-text)] border-green-200',
+  '': 'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 export const StatusPill: React.FC<StatusPillProps> = ({ status }) => {
   if (!status) {
-    return <span className="text-[var(--text-tertiary)]">—</span>;
+    return <span className="text-slate-400">—</span>;
   }
   
-  const colorClasses = statusColorMap[status] || 'bg-gray-500/20 text-gray-300';
+  const colorClasses = statusColorMap[status] || 'bg-slate-100 text-slate-600';
   
   return (
-    <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full capitalize ${colorClasses}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium border ${colorClasses}`}>
       {status}
     </span>
   );
